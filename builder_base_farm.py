@@ -43,7 +43,8 @@ def attack(network_error):
     if network_error.value == False:
         while True:
             try:
-                battle_machine_loc = pyautogui.locateCenterOnScreen("battle-machine.png", confidence=0.95)
+                battle_machine_loc = pyautogui.locateCenterOnScreen("battle-machine.png", confidence=0.99)
+                popup("Attack - 1", "red")
                 pyautogui.click(384, 1022)
                 time.sleep(0.1)
                 pyautogui.click(183, 586)
@@ -64,13 +65,40 @@ def attack(network_error):
                 pass
                 time.sleep(5)
 
+def second_phase_attack(network_error):
+    if network_error.value == False:
+        while True:
+            try:
+                reinforcement_loc = pyautogui.locateCenterOnScreen("reinforcement.png", confidence=0.95)
+                popup("Attack - 2", "red")
+                pyautogui.click(384, 1022)
+                time.sleep(0.1)
+                pyautogui.click(183, 586)
+                time.sleep(0.1)
+                pyautogui.click(384 + 125 + 750, 1022)
+                time.sleep(0.1)
+                pyautogui.moveTo(183, 586)
+                pyautogui.mouseDown()
+                time.sleep(3)
+                pyautogui.mouseUp()
+                time.sleep(5)
+                for i in range(7, 9):  # Slots 7 and 8
+                    x = 384 + 125 * i
+                    pyautogui.click(x, 1022)
+                    time.sleep(3)
+            except: 
+                pass
+            time.sleep(5)
+
 if __name__ == "__main__":
     network_error = Value('b', False)
     network_error_fix_process = Process(target=network_error_fix, args=(network_error,))
     start_match_process = Process(target=start_match, args=(network_error,))
     attack_process = Process(target=attack, args=(network_error,))
+    second_phase_attack_process = Process(target=second_phase_attack, args=(network_error,))
 
     network_error_fix_process.start()
     start_match_process.start()
     attack_process.start()
+    second_phase_attack_process.start()
     pass
