@@ -8,22 +8,34 @@ def logger_popup(log_q):
     root = tk.Tk()
     root.title("Log Console")
     root.attributes("-topmost", True)
-    root.geometry("600x300+1200+20")  # Top-right corner
+    root.geometry("600x300+1200+20")
     root.configure(bg="black")
 
-    text = tk.Text(root, bg="black", fg="lime", font=("Consolas", 10), wrap="word")
+    text = tk.Text(root, bg="black", fg="white", font=("Consolas", 10), wrap="word")
     text.pack(expand=True, fill="both")
 
     def poll_queue():
         try:
             while not log_q.empty():
-                msg = log_q.get()
+                msg, color = log_q.get()
                 timestamp = time.strftime("%H:%M:%S")
-                text.insert(tk.END, f"[{timestamp}] {msg}\n")
+                text.insert(tk.END, f"[{timestamp}] ", "timestamp")
+                text.insert(tk.END, msg + "\n", color)
                 text.see(tk.END)
         except Exception as e:
             text.insert(tk.END, f"[ERROR] Logger died: {e}\n")
         root.after(200, poll_queue)
+
+    # Define tag styles
+    # Define tag styles
+    text.tag_config("green", foreground="lime", font=("Consolas", 15, "bold"))
+    text.tag_config("red", foreground="red", font=("Consolas", 15, "bold"))
+    text.tag_config("yellow", foreground="yellow", font=("Consolas", 15, "bold"))
+    text.tag_config("blue", foreground="deepskyblue", font=("Consolas", 15, "bold"))
+    text.tag_config("gray", foreground="gray", font=("Consolas", 15))
+    text.tag_config("timestamp", foreground="gray", font=("Consolas", 10, "italic"))
+    text.tag_config("hotpink", foreground="#FF69B4", font=("Consolas", 10))  # smaller font
+    text.tag_config("orange", foreground="orange", font=("Consolas", 15, "bold"))
 
 
     poll_queue()
@@ -33,12 +45,12 @@ def network_error_fix(network_error, log_q):
     while True:
         try:
             try_again_loc = pyautogui.locateCenterOnScreen("network-error.png", confidence=0.8) 
-            log_q.put("Network Error Detected")
+            log_q.put(("Network Error Detected", "timestamp"))
             pyautogui.click(689, 652)
             time.sleep(10)
         except:
             network_error.value = False
-            log_q.put("No Network Error")
+            log_q.put(("No Network Error", "gray"))
         time.sleep(1)
 
 def start_match(network_error, log_q):
@@ -46,7 +58,7 @@ def start_match(network_error, log_q):
         while True:
             try:
                 attack_button_loc = pyautogui.locateCenterOnScreen("builder-attack-button.png", confidence=0.8)
-                log_q.put("Starting Match")
+                log_q.put(("Starting Match", "blue"))
                 pyautogui.click(attack_button_loc)
                 time.sleep(0.5)
                 find_now_button_loc = pyautogui.locateCenterOnScreen("find-now-button.png", confidence=0.8)
@@ -61,7 +73,7 @@ def attack(network_error, log_q):
         while True:
             try:
                 battle_machine_loc = pyautogui.locateCenterOnScreen("battle-machine.png", confidence=0.99)
-                log_q.put("Attack - 1")
+                log_q.put(("Attack - 1", "green"))
                 pyautogui.click(384, 1022)
                 time.sleep(0.1)
                 pyautogui.click(183, 586)
@@ -87,7 +99,7 @@ def second_phase_attack(network_error, log_q):
         while True:
             try:
                 reinforcement_loc = pyautogui.locateCenterOnScreen("reinforcement.png", confidence=0.95)
-                log_q.put("Attack - 2")
+                log_q.put(("Attack - 2", "green"))
                 pyautogui.click(384, 1022)
                 time.sleep(0.1)
                 pyautogui.click(183, 586)
@@ -112,7 +124,7 @@ def end_game(network_error, log_q):
         while True:
             try:
                 end_game_loc = pyautogui.locateCenterOnScreen("builder-return-home.png", confidence=0.8)
-                log_q.put("Ending Game")
+                log_q.put(("Ending Game", "blue"))
                 pyautogui.click(end_game_loc)
             except:
                 pass
